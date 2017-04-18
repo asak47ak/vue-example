@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">	
+	<link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" crossorigin="anonymous">
+	<script src="https://unpkg.com/vue/dist/vue.js"></script>
+	<style>
+		.overline{
+			color: red;
+			text-decoration: line-through;
+		}
+	</style>
+	<title>TODO LIST</title>
+</head>
+<body>
+	<div class="container">
+		<div class="row">
+			<div class="jumbotron">
+				<h1>TODO LIST <small>localstorage版本</small></h1>
+				<h3>输入内容后敲击回车</h3>
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="form-group">
+				<input type="text" class="form-control" v-model="todo" v-on:keydown.enter="go">
+			</div>
+		</div>
+		
+		<div class="row">
+			<div class="list-group" v-if="dos !== []">
+				<div class="list-group-item" v-for="(item,index) in dos">
+					<span class="text-muted did" @click="done(index)" v-bind:class="{'overline':item.isFinished}">{{item.name}}</span>
+					<button type="button" class="close" @click="del(index)">&times;</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<script>
+		new Vue({
+			el:".container",
+			data:{
+				todo:"",
+				names:"xiao",
+				dos:getStorge("xiao")
+			},
+			methods:{
+				go:function (){
+					if(this.todo){
+						this.dos.push({
+							name:this.todo,
+							isFinished:false
+						});
+					}					
+					//addStorge("xiao",this.dos);
+					this.todo = "";
+				},
+				del:function(index){
+					this.dos.splice(index,1);
+					//addStorge("xiao",this.dos);
+				},
+				done:function (index){
+					this.dos[index].isFinished = !this.dos[index].isFinished;
+					//addStorge("xiao",this.dos);
+				}
+			},
+			watch:{
+				dos:{
+					handler:function(){
+						addStorge(this.names,this.dos);
+					},
+					deep:true
+				}
+			}
+		});
+
+		function addStorge(name,items){
+			var nameStr = String(name);
+			window.localStorage.setItem(nameStr,JSON.stringify(items));
+		}
+
+		function getStorge(name){
+			var nameStr = String(name);
+			return JSON.parse(window.localStorage.getItem(nameStr) || '[]');
+		}
+
+		function remStorage(name){
+			var nameStr = String(name);
+			window.localStorage.removeItem(nameStr);
+		}
+	</script>
+</body>
+</html>
