@@ -1,0 +1,66 @@
+{
+	"status":0,
+	"message":"",
+	"length":10,
+	"result":[
+				{
+					"timuId":"100001",
+					"timuleixing":1,
+					"timu":"CSS的选择器有哪些？",
+					"daan":[
+						{"timus":"ID选择器","check":false},
+						{"timus":"层级选择器","check":false},
+						{"timus":"类选择器","check":false},
+						{"timus":"元素选择器","check":false}
+					],
+					"zhengquedaan":15,
+					"daduimeiyou":true
+				},{
+					"timuId":"100002",
+					"timuleixing":0,
+					"timu":"下面那个是匿名自执行函数？",
+					"daan":[
+						{"timus":"window.onload = function () {}","check":false},
+						{"timus":"funciton () {}","check":false},
+						{"timus":"(function () {})();","check":false},
+						{"timus":"()();","check":false}
+					],
+					"zhengquedaan":2,
+					"daduimeiyou":true
+				},{
+					"timuId":"100003",
+					"timuleixing":2,
+					"timu":"js是JavaScript的缩写吗？",
+					"daan":[
+						{"timus":"对","check":false},
+						{"timus":"错","check":false}
+					],
+					"zhengquedaan":0,
+					"daduimeiyou":true
+				},{
+					"timuId":"100004",
+					"timuleixing":0,
+					"timu":"[“1”, “2”, “3”].map(parseInt) 答案是多少？",
+					"daan":[
+						{"timus":"[1,NaN,NaN]","check":false},
+						{"timus":"[1,NaN,1]","check":false},
+						{"timus":"[NaN,NaN,NaN]","check":false},
+						{"timus":"[1,1,NaN]","check":false}
+					],
+					"zhengquedaan":0,
+					"daduimeiyou":true
+				},{
+					"timuId":"100005",
+					"timuleixing":0,
+					"timu":"for (var i = 0; i < 5; i++) {setTimeout(function() {console.log(new Date, i);}, 1000);} 正确答案是？",
+					"daan":[
+						{"timus":"0,1,2,3,4,5","check":false},
+						{"timus":"5,0,1,2,3,4","check":false},
+						{"timus":"5,5,5,5,5,5","check":false},
+						{"timus":"1,2,3,4,5,6","check":false}
+					],
+					"zhengquedaan":2,
+					"daduimeiyou":true
+				}
+			]
+}

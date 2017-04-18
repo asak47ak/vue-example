@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">	
+	<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">	
+	<link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" crossorigin="anonymous">
+	<script src="https://unpkg.com/vue/dist/vue.js"></script>
+	<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+	<style>
+		.daan{
+			margin-bottom: 1.5rem;
+			color: #333;
+			text-align: left;
+		}
+		.alert-default{
+			border: 1px solid #ddd;
+			height: 230px;
+		}
+		.daan:hover,.alert-default:hover{
+			background-color: #f6f6f6;
+			border: 1px solid #ccc;
+			cursor: pointer;
+		}
+	</style>
+	<title>前端水有多深</title>
+</head>
+<body>
+	<div class="container">
+		<div class="jumbotron">
+			<h3>前端－水有多深</h3>
+		</div>
+		<div class="panel panel-default" v-for="(item,index) in dangqiantimu" v-show="!wanbi">
+			<div class="panel-heading">
+				<p class="text-muted clearfix">
+					<span class="pull-left">
+					{{item.timuleixing === 0 ? "单选题" : "" }}
+					{{item.timuleixing === 1 ? "多选题" : "" }}
+					{{item.timuleixing === 2 ? "判断题" : "" }}
+					</span>
+					<span class="pull-right">					
+						进度<small>{{dijiti + 1}}/{{leng}}</small>
+					</span>
+				</p>				
+			</div>
+			<div class="panel-body">
+				<div class="row">
+					<div class="col-md-6">
+						<div class="alert alert-default">
+							<p class="text-muted">
+								{{item.timu}}
+							</p>
+						</div>
+					</div>
+					<div class="col-md-6">
+						<div class="list-group" v-for="(it,inde) in item.daan">
+							<div class="list-group-item daan" v-bind:class="{active:it.check}" v-on:click="addActive(inde)">
+								<b>{{inde | daanbianhao}}: </b>
+								<span class="list-group-item-text">{{it.timus}}</span>
+							</div>
+						</div>
+					</div>					
+				</div>
+				<div class="row text-center">						
+					<div class="btn btn-default" @click="datiwanbi(index)">提 交</div>
+				</div>
+			</div>			
+		</div>
+		<div class="" v-show="wanbi">
+			<div class="well">				
+				<h4 class="text-success">总共{{leng}}题 答对{{dadui}}题 答错{{leng - dadui}}题</h4>
+			</div>
+			<h4>错题：</h4>
+			<div class="list-group" v-for="ti in cuowutimu">
+				<div class="list-group-item">
+					<p class="text-muted">
+						{{ti.timuleixing === 0 ? "单选题" : "" }}
+						{{ti.timuleixing === 1 ? "多选题" : "" }}
+						{{ti.timuleixing === 2 ? "判断题" : "" }}
+					</p>
+					<p class="text-muted">
+						题目：{{ti.timu}}
+					</p>
+					<div class="list-group">
+						<p>你选择的是：</p>
+						<div v-for="(ts,index) in ti.daan">
+							<p class="list-group-item" v-bind:class="{'list-group-item-danger':ts.check}">
+								<b>{{index | daanbianhao}}: </b>
+								<span>{{ts.timus}}</span>
+							</p>
+						</div>
+					</div>
+					<br>
+					<div class="btn-group">
+						<blockquote>正确答案是：{{daanzhuanhuan(ti.zhengquedaan,ti.timuleixing)}}</blockquote>
+					</div>
+				</div>
+			</div>
+		</div>			
+	</div>
+	<script>
+		new Vue({
+			el:".container",
+			data:{
+				result:[],/*全部的题目*/
+				dijiti:0,/*当前是第几题*/
+				dangqian:null,/*当前具体的题目集合*/
+				dadui:0,/*答对题目数量*/
+				leng:0,/*总题目数*/
+				xuanze:null,/*选择的是哪个答案*/
+				wanbi:false,/*是否全部答完*/
+				cuowutimu:[]/*错误的题目*/
+			},
+			methods:{
+				/*获取题目*/
+				getData:function (){
+					var _this = this;
+					axios.get("./daan.json").then(function (res){
+						_this.result = res.data.result;
+						_this.leng = _this.result.length;
+					});
+				},
+				/*答完每一题点击提交*/
+				datiwanbi:function(index){
+					var _this = this;
+
+					/*如果选择了答案 没选就不执行*/
+					if(_this.xuanze !== null){
+						/*如果题目没到最后一题*/
+						if(_this.dijiti < _this.leng - 1){
+							_this.dangqian.forEach(function(val,ind){
+								/**/
+								if(_this.xuanze === _this.dangqian[ind].zhengquedaan){
+									_this.dadui += 1;
+								}else{
+									_this.cuowutimu.push(val);
+								}
+							});
+							_this.dijiti += 1;
+							/*答题完了 要把选择的置空*/
+							_this.xuanze = null;
+							/*如果题目到最后一题*/
+						}else if(_this.dijiti === _this.leng - 1){
+							_this.dangqian.forEach(function(val,ind){
+								if(_this.xuanze === _this.dangqian[ind].zhengquedaan){
+									_this.dadui += 1;
+								}else{
+									_this.cuowutimu.push(val);
+								}
+							});
+							_this.dijiti += 1;
+							/*答题完了 要把选择的置空*/
+							_this.xuanze = null;
+							/*改变完毕状态*/
+							_this.wanbi = true;
+						}else{
+							_this.wanbi = true;
+						}
+					}
+				},
+				/*选择答案*/
+				addActive:function(index){
+					var _this = this;
+					
+					this.dangqian.forEach(function(val,ind){
+
+						/*如果是单选题和判断题则：*/
+						/*单选题传0 1 2 3*/
+						/*判断题传0 1*/
+						if(_this.dangqian[ind].timuleixing === 0 || _this.dangqian[ind].timuleixing === 2){
+							val.daan.forEach(function(v,i){
+								v.check = false;
+							});
+							val.daan[index].check = true;
+
+							_this.xuanze = index;
+						}
+
+						/*如果是多选题则：*/
+						/*多选题按照1 2 4 8 16原则计算*/
+						if(_this.dangqian[ind].timuleixing === 1){
+							val.daan[index].check = !val.daan[index].check;
+
+							if(val.daan[index].check){
+								/*Math.pow(2,index) 方法给每个加上*/
+								_this.xuanze += Math.pow(2,index);
+							}else if(!val.daan[index].check){
+								_this.xuanze -= Math.pow(2,index);
+							}
+						}
+					});
+				},
+				daanzhuanhuan:function(value,type){
+					var _this = this;					
+					if(type === 0 || type === 2){
+						switch (value){
+							case 0 :{
+								return "A";
+								break;
+							};
+							case 1 :{
+								return "B";
+								break;
+							};
+							case 2 :{
+								return "C";
+								break;
+							};
+							case 3 :{
+								return "D";
+								break;
+							};
+						}
+					}else if(type === 1){
+						switch(value){
+							case 3:{
+								return "AB";
+								break;
+							};
+							case 5:{
+								return "AC";
+								break;
+							};
+							case 6:{
+								return "BC";
+								break;
+							};
+							case 7:{
+								return "ABC";
+								break;
+							};
+							case 9:{
+								return "AD";
+								break;
+							};
+							case 10:{
+								return "BD";
+								break;
+							};
+							case 11:{
+								return "ABD";
+								break;
+							};
+							case 12:{
+								return "CD";
+								break;
+							};
+							case 13:{
+								return "ACD";
+								break;
+							};
+							case 14:{
+								return "BCD";
+								break;
+							};
+							case 15:{
+								return "ABCD";
+								break;
+							};
+						}
+					}
+				}
+			},
+			mounted:function(){
+				/*开场获取数据*/
+				this.$nextTick(function(){
+					this.getData();
+				});
+			},
+			computed:{
+				/*计算当前的题目*/
+				dangqiantimu:function(){
+					this.dangqian = this.result.slice(this.dijiti,this.dijiti + 1);
+					return this.dangqian;
+				}
+			},
+			filters:{
+				/*过滤答案的标识ABCD*/
+				daanbianhao:function(val){
+					switch (val){
+						case 0 :{
+							return "A";
+							break;
+						};
+						case 1 :{
+							return "B";
+							break;
+						};
+						case 2 :{
+							return "C";
+							break;
+						};
+						case 3 :{
+							return "D";
+							break;
+						};
+					}
+				}
+			}
+		});
+	</script>
+</body>
+</html>
